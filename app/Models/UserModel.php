@@ -93,3 +93,4 @@ class UserModel extends Model
         return $this->update($userId, $data);
     }
 }
+

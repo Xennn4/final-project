@@ -3,6 +3,21 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
+/**
+ * StockMovementModel
+ *
+ * @property int $id
+ * @property int $facility_id
+ * @property int $medicine_id
+ * @property int $batch_id
+ * @property string $movement_type
+ * @property int $quantity
+ * @property string|null $reference_type
+ * @property string|null $reference_id
+ * @property string|null $remarks
+ * @property int $performed_by
+ * @property string $created_at
+ */
 
 class StockMovementModel extends Model
 {
