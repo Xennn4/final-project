@@ -4,32 +4,39 @@ use CodeIgniter\Router\RouteCollection;
 
 /** @var RouteCollection $routes */
 
+// --- Public Authentication Routes ---
 $routes->get('/', 'AuthController::login');
-$routes->get('/login', 'AuthController::login');
-$routes->post('/login', 'AuthController::loginProcess');
-$routes->get('/register', 'AuthController::register');
-$routes->post('/register', 'AuthController::registerProcess');
-$routes->get('/logout', 'AuthController::logout');
-$routes->get('/unauthorized', 'AuthController::unauthorized');
+$routes->get('login', 'AuthController::login');
+$routes->post('login', 'AuthController::loginProcess');
+$routes->get('register', 'AuthController::register');
+$routes->post('register', 'AuthController::registerProcess');
+$routes->get('logout', 'AuthController::logout');
+$routes->get('unauthorized', 'AuthController::unauthorized');
 
-$routes->group('', ['filter' => ['auth', 'staff']], static function (RouteCollection $routes): void {
-    $routes->get('/staff/dashboard', 'StaffController::dashboard');
-    $routes->get('/supply/requisition', 'SupplyChainController::requisition');
-    $routes->post('/supply/requisition', 'SupplyChainController::fulfillRequisition');
-    $routes->get('/profile', 'ProfileController::show');
-    $routes->get('/profile/edit', 'ProfileController::edit');
-    $routes->post('/profile/update', 'ProfileController::update');
+// --- Unified Authenticated Web Routes ---
+$routes->group('', ['filter' => 'auth'], static function (RouteCollection $routes): void {
+    
+    // Dashboards
+    $routes->get('dashboard', 'Home::index');
+    $routes->get('staff/dashboard', 'StaffController::dashboard');
+
+    // Supply Chain Operations
+    $routes->get('supply', 'SupplyChainController::index');
+    $routes->get('supply/intake', 'SupplyChainController::intake');
+    $routes->post('supply/intake', 'SupplyChainController::storeIntake');
+    $routes->get('supply/disposal', 'SupplyChainController::disposal');
+    $routes->post('supply/disposal/flag-expired', 'SupplyChainController::flagExpired');
+    
+    $routes->get('supply/requisition', 'SupplyChainController::requisition');
+    $routes->post('supply/requisition', 'SupplyChainController::fulfillRequisition');
+
+    // User Profile
+    $routes->get('profile', 'ProfileController::show');
+    $routes->get('profile/edit', 'ProfileController::edit');
+    $routes->post('profile/update', 'ProfileController::update');
 });
 
-$routes->group('', ['filter' => ['auth', 'manager']], static function (RouteCollection $routes): void {
-    $routes->get('/dashboard', 'Home::index');
-    $routes->get('/supply', 'SupplyChainController::index');
-    $routes->get('/supply/intake', 'SupplyChainController::intake');
-    $routes->post('/supply/intake', 'SupplyChainController::storeIntake');
-    $routes->get('/supply/disposal', 'SupplyChainController::disposal');
-    $routes->post('/supply/disposal/flag-expired', 'SupplyChainController::flagExpired');
-});
-
+// --- Strict SuperAdmin Routes ---
 $routes->group('admin', ['filter' => ['auth', 'superadmin']], static function (RouteCollection $routes): void {
     $routes->get('roles', 'Admin\RoleController::index');
     $routes->get('roles/create', 'Admin\RoleController::create');
@@ -42,6 +49,7 @@ $routes->group('admin', ['filter' => ['auth', 'superadmin']], static function (R
     $routes->post('users/assign-role/(:num)', 'Admin\UserAdminController::assignRole/$1');
 });
 
+// --- API Routes ---
 $routes->post('api/v1/auth/login', 'Api\AuthController::issueToken');
 
 $routes->group('api/v1', ['filter' => 'api_auth'], static function (RouteCollection $routes): void {
@@ -49,18 +57,18 @@ $routes->group('api/v1', ['filter' => 'api_auth'], static function (RouteCollect
 
     $routes->resource('facilities', [
         'controller'  => 'Api\FacilitiesController',
-        'placeholder' => '(:num)',
         'except'      => ['new', 'edit', 'delete'],
     ]);
+    
     $routes->resource('medicines', [
         'controller'  => 'Api\MedicinesController',
-        'placeholder' => '(:num)',
         'except'      => ['new', 'edit'],
     ]);
+    
     $routes->get('stock/current', 'Api\MedicinesController::currentStock');
+    
     $routes->resource('medicine-batches', [
         'controller'  => 'Api\MedicineBatchesController',
-        'placeholder' => '(:num)',
         'except'      => ['new', 'edit', 'delete'],
     ]);
 

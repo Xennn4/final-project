@@ -1,5 +1,6 @@
 <?php
 
+// app/Controllers/AuthController.php
 
 namespace App\Controllers;
 
@@ -16,7 +17,6 @@ class AuthController extends BaseController
 
             if (! in_array($role, ['superadmin', 'manager', 'staff'], true)) {
                 session()->destroy();
-
                 return redirect()->to('/login');
             }
 
@@ -34,14 +34,27 @@ class AuthController extends BaseController
             'password' => 'required',
         ];
 
-        // Safely extract payload for both Postman (JSON) and Web (POST Data)
-        $json = $this->request->getJSON();
-        $email = $json->email ?? $this->request->getPost('email');
-        $password = $json->password ?? $this->request->getPost('password');
+        // 1. Default to standard Web Form POST data
+        $email    = $this->request->getPost('email');
+        $password = $this->request->getPost('password');
 
-        if (! $this->validate($rules)) {
+        // 2. ONLY parse JSON if the incoming request explicitly declares it is JSON
+        if (strpos($this->request->getHeaderLine('Content-Type'), 'application/json') !== false) {
+            $json = $this->request->getJSON();
+            if ($json) {
+                $email    = $json->email ?? $email;
+                $password = $json->password ?? $password;
+            }
+        }
+
+        $validationData = [
+            'email'    => $email,
+            'password' => $password
+        ];
+
+        if (! $this->validateData($validationData, $rules)) {
             // Return JSON if requested via Postman
-            if ($this->request->is('json')) {
+            if (strpos($this->request->getHeaderLine('Content-Type'), 'application/json') !== false) {
                 return $this->response->setJSON([
                     'status' => 400,
                     'errors' => $this->validator->getErrors()
@@ -56,7 +69,7 @@ class AuthController extends BaseController
         $found = $userModel->findByEmailWithRole($email);
 
         if (! $found || ! password_verify($password, $found['password'])) {
-            if ($this->request->is('json')) {
+            if (strpos($this->request->getHeaderLine('Content-Type'), 'application/json') !== false) {
                 return $this->response->setJSON([
                     'status' => 401,
                     'error'  => 'Invalid email or password.'
@@ -78,7 +91,7 @@ class AuthController extends BaseController
         ]);
 
         // Success response for Postman
-        if ($this->request->is('json')) {
+        if (strpos($this->request->getHeaderLine('Content-Type'), 'application/json') !== false) {
             return $this->response->setJSON([
                 'status'  => 200,
                 'message' => 'Login successful',
@@ -111,7 +124,6 @@ class AuthController extends BaseController
 
             if (! in_array($role, ['superadmin', 'manager', 'staff'], true)) {
                 session()->destroy();
-
                 return redirect()->to('/register');
             }
 
@@ -131,14 +143,32 @@ class AuthController extends BaseController
             'confirm_password' => 'required|matches[password]',
         ];
 
-        // Safely extract payload for both Postman (JSON) and Web (POST Data)
-        $json = $this->request->getJSON();
-        $name = $json->name ?? $this->request->getPost('name');
-        $email = $json->email ?? $this->request->getPost('email');
-        $password = $json->password ?? $this->request->getPost('password');
+        // 1. Default to standard Web Form POST data
+        $name             = $this->request->getPost('name');
+        $email            = $this->request->getPost('email');
+        $password         = $this->request->getPost('password');
+        $confirm_password = $this->request->getPost('confirm_password');
 
-        if (! $this->validate($rules, ['confirm_password' => ['matches' => 'Passwords do not match.']])) {
-            if ($this->request->is('json')) {
+        // 2. ONLY parse JSON if the incoming request explicitly declares it is JSON
+        if (strpos($this->request->getHeaderLine('Content-Type'), 'application/json') !== false) {
+            $json = $this->request->getJSON();
+            if ($json) {
+                $name             = $json->name ?? $name;
+                $email            = $json->email ?? $email;
+                $password         = $json->password ?? $password;
+                $confirm_password = $json->confirm_password ?? $confirm_password;
+            }
+        }
+
+        $validationData = [
+            'name'             => $name,
+            'email'            => $email,
+            'password'         => $password,
+            'confirm_password' => $confirm_password
+        ];
+
+        if (! $this->validateData($validationData, $rules, ['confirm_password' => ['matches' => 'Passwords do not match.']])) {
+            if (strpos($this->request->getHeaderLine('Content-Type'), 'application/json') !== false) {
                 return $this->response->setJSON([
                     'status' => 400,
                     'errors' => $this->validator->getErrors()
@@ -158,7 +188,7 @@ class AuthController extends BaseController
             'role_id'  => $staffRole['id'] ?? null,
         ]);
 
-        if ($this->request->is('json')) {
+        if (strpos($this->request->getHeaderLine('Content-Type'), 'application/json') !== false) {
             return $this->response->setJSON([
                 'status'  => 201,
                 'message' => 'Registration successful! Please log in.'
@@ -173,7 +203,7 @@ class AuthController extends BaseController
     {
         session()->destroy();
 
-        if ($this->request->is('json')) {
+        if (strpos($this->request->getHeaderLine('Content-Type'), 'application/json') !== false) {
             return $this->response->setJSON([
                 'status'  => 200,
                 'message' => 'Logged out successfully.'

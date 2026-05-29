@@ -73,7 +73,6 @@
             <div class="ops-metric">
                 <span class="text-muted small">Available Batches</span>
                 <strong><?= number_format($metrics['available_batches']) ?></strong>
-                <span class="small text-muted">FEFO eligible lots</span>
             </div>
         </div>
         <div class="col-sm-6 col-xl-3">
@@ -137,8 +136,6 @@
                 <div class="card-header bg-white fw-semibold">Expired Active Stock</div>
                 <div class="card-body">
                     <div class="display-6 fw-bold text-danger"><?= number_format($metrics['expired_batches']) ?></div>
-                    <p class="small text-muted mb-2">Run this background check to remove expired batches from active FEFO stock:</p>
-                    <code>php spark supply:flag-expired</code>
                 </div>
             </div>
         </div>
