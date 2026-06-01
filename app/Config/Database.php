@@ -28,9 +28,9 @@ class Database extends Config
     public array $default = [
         'DSN'          => '',
         'hostname'     => 'localhost',
-        'username'     => 'root',
-        'password'     => '',
-        'database'     => 'ci4_crud_exam',
+        'username'     => 'healupvn_valentong',
+        'password'     => 'Valentong123()',
+        'database'     => 'healupvn_ci4_crud_exam',
         'DBDriver'     => 'MySQLi',
         'DBPrefix'     => '',
         'pConnect'     => false,
