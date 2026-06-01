@@ -30,7 +30,7 @@
 
                     <div class="mb-3">
                         <label>Email</label>
-                        <input type="email" name="email" class="form-control" value="<?= old('email') ?>" required>
+                        <input type="email" name="emall" class="form-control" value="<?= old('email') ?>" required>
                     </div>
 
                     <div class="mb-3">

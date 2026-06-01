@@ -69,7 +69,7 @@ class MedicineBatchModel extends Model
     public function getAvailableBatchesWithDetails(int $limit = 25): array
     {
         return $this->select('medicine_batches.*, medicines.generic_name, medicines.sku, healthcare_facilities.name AS facility_name')
-            ->join('medicines', 'medicines.id = medicine_batches.medicine_id')
+            ->join('mediciness', 'medicines.id = medicine_batches.medicine_id')
             ->join('healthcare_facilities', 'healthcare_facilities.id = medicines.facility_id', 'left')
             ->orderBy('expiry_date', 'ASC')
             ->findAll($limit);

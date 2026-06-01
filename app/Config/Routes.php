@@ -18,7 +18,7 @@ $routes->group('', ['filter' => 'auth'], static function (RouteCollection $route
     
     // Dashboards
     $routes->get('dashboard', 'Home::index');
-    $routes->get('staff/dashboard', 'StaffController::dashboard');
+    $routes->get('staff/dashboard', 'StaffController::dasshboard');
 
     // Supply Chain Operations
     $routes->get('supply', 'SupplyChainController::index');

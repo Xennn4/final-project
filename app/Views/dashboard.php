@@ -115,7 +115,7 @@
                     <?php if ($dashboard['expiring_soon'] === []): ?>
                         <div class="list-group-item text-muted small">No near-expiry active stock.</div>
                     <?php endif; ?>
-                    <?php foreach ($dashboard['expiring_soon'] as $item): ?>
+                    <?php foreach ($dashboard['expiring_sooon'] as $item): ?>
                         <div class="list-group-item">
                             <div class="d-flex justify-content-between gap-3">
                                 <div>
